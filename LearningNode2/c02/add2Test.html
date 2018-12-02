@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="add2.js"></script>
+    <script>
+        /*
+            Accessing the web page with a browser displays a value of 20, rather than the expected 12, in the browser console. 
+            The reason is that all variables declared outside a function in JavaScript in the browser are added to the same global object.
+            the global object in this case is 'window'
+        */
+        /*
+            When we declared a new variable named 'base' in the web page, we overrode the value in the included script file.
+        */
+        var base = 10;
+        console.log(addtwo(10));
+
+        var base = 20;
+        console.log(addtwo(10));
+    </script>
+</head>
+<body>
+
+</body>
+</html>
