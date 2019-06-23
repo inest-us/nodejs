@@ -1,4 +1,4 @@
-function Circle(x, y, r) {
+function circle(x, y, r) {
     function r_squared() {
         return Math.pow(r, 2);
     }
@@ -14,4 +14,4 @@ function Circle(x, y, r) {
 
 //you can export any object, in this case, you are just exporting the Circle constructor function,
 //Which is a module user can use to create fully functional Circle instances
-module.exports = Circle;
+module.exports.circle = circle;
