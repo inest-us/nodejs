@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/inest-us/nodejs/issues"
   },
-  "homepage": "https://github.com/inest-us/nodejs#readme"
+  "homepage": "https://github.com/inest-us/nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
