@@ -2,13 +2,7 @@ var express = require('express');
 var app = express(); 
 app.set('port', process.env.PORT || 3000); 
 app.use(express.static(__dirname + '/public'));
-var fortunes = [
-    "Conquer your fears or they will conquer you.",
-    "Rivers need springs.", 
-    "Do not fear what you don't know.", 
-    "You will have a pleasant surprise.", 
-    "Whenever possible, keep it simple."
-];
+var fortune = require('./lib/fortune');
 
 // set up handlebars view engine 
 var handlebars = require('express-handlebars').create({ 
@@ -23,7 +17,7 @@ app.get('/', function (req , res) {
 }); 
 
 app.get('/about', function (req , res) { 
-    var randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+    var randomFortune = fortune.getFortune();
     res.render('about', {fortune: randomFortune});
 }); 
 
