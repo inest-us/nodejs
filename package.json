@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -u tdd -R spec qa/tests-unit.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "eslint": "eslint index.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,11 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "eslint": "^6.0.1",
+    "grunt": "^1.0.4",
+    "grunt-cafe-mocha": "^0.1.13",
+    "grunt-contrib-jshint": "^2.1.0",
+    "grunt-exec": "^3.0.0",
     "mocha": "^6.1.4"
   }
 }
