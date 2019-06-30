@@ -3,6 +3,7 @@ var app = express();
 app.set('port', process.env.PORT || 3000); 
 app.use(express.static(__dirname + '/public'));
 var fortune = require('./lib/fortune');
+var weather = require('./lib/weather');
 var tours = [
     {id: 0, name: 'Hood River', price: 99.99},
     {id: 1, name: 'Oregon Coast', price: 149.95}
@@ -30,7 +31,7 @@ app.use(function (req, res, next) {
     if (!res.locals.partials) {
 		res.locals.partials = {}; 
     }
-	res.locals.partials.weatherContext = getWeatherData(); 
+	res.locals.partials.weatherContext = weather.getWeatherData(); 
     next(); 
 });
 
@@ -107,33 +108,4 @@ app.use(function(err, req, res, next) {
 
 app.listen(app.get('port'), function () { 
     console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.'); 
-}); 
-
-function getWeatherData() { 
-	return { 
-		locations: [ 
-			{ 
-                name: 'Portland', 
-                forecastUrl: 'http://www.wunderground.com/US/OR/Portland.html', 
-                iconUrl: 'http://icons-ak.wxug.com/i/c/k/cloudy.gif', 
-                weather: 'Overcast', 
-                temp: '54.1 F (12.3 C)' 
-            }, 
-			{ 
-                name: 'Bend', 
-                forecastUrl: 'http://www.wunderground.com/US/OR/Bend.html', 
-                iconUrl: 'http://icons-ak.wxug.com/i/c/k/partlycloudy.gif', 
-                weather: 'Partly Cloudy', 
-                temp: '55.0 F (12.8 C)' 
-            }, 
-			{ 
-                name: 'Manzanita', 
-                forecastUrl: 'http://www.wunderground.com/US/OR/Manzanita.html', 
-                iconUrl: 'http://icons-ak.wxug.com/i/c/k/rain.gif', 
-                weather: 'Light Rain', 
-                temp: '55.0 F (12.8 C)' 
-            } 
-		]
-	}; 
-}
-
+});
