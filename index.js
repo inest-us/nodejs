@@ -2,6 +2,8 @@ var express = require('express');
 var app = express(); 
 app.set('port', process.env.PORT || 3000); 
 app.use(express.static(__dirname + '/public'));
+app.use(require('body-parser').urlencoded({ extended : true })); 
+
 var fortune = require('./lib/fortune');
 var weather = require('./lib/weather');
 var tours = [
@@ -91,6 +93,22 @@ app.put('/api/tour/:id', function (req , res) {
     } else {
         res.json({error: 'No such tour exists.'});
     }
+}); 
+
+app.get('/newsletter', function (req , res) { 
+    res.render('newsletter', { csrf : 'CSRF token goes here' }); 
+}); 
+
+app.get('/thank-you', function (req , res) { 
+    res.render('thank-you', {user: req.query.user}); 
+}); 
+
+app.post('/process', function (req, res) { 
+    console.log('Form (from querystring): ' + req.query.form); 
+    console.log('CSRF token (from hidden form field): ' + req.body._csrf); 
+    console.log('Name (from visible form field): ' + req.body.name ); 
+    console.log('Email (from visible form field): ' + req.body.email); 
+    res.redirect(303 , '/thank-you?user=' + req.body.name); 
 }); 
 
 // custom 404 page 
