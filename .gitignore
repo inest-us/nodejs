@@ -49,3 +49,4 @@ jspm_packages
 .DS_Store
 package-lock.json
 .DS_Store
+lib/credentials.js

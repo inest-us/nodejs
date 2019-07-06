@@ -9,6 +9,12 @@
 </head> 
 <body> 
     <header><img src="/img/logo.png" alt="iNest LLC" height="100" width="100"></header>
+    {{#if flash}}
+        <div class="alert alert-dismissible alert-{{flash.type}}">
+            <button>&times;</button>
+            <strong>{{flash.intro}}</strong>{{{flash.message}}}
+        </div>
+    {{/if}}
     {{{body}}} 
     {{#if showTests}} 
         <div id="mocha"></div> 
