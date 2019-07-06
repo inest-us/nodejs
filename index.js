@@ -1,10 +1,15 @@
 var express = require('express'); 
 var app = express(); 
-var formidable=require('formidable');
+var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
+var fortune = require('./lib/fortune');
+var weather = require('./lib/weather');
+var credentials = require('./lib/credentials');
+
 app.set('port', process.env.PORT || 3000); 
 app.use(express.static(__dirname + '/public'));
 app.use(require('body-parser').urlencoded({ extended : true })); 
+app.use(require('cookie-parser')(credentials.cookiesSecret));
 app.use('/upload', function(req, res, next) { 
     var now = Date.now(); 
     jqupload.fileHandler({ 
@@ -16,16 +21,29 @@ app.use('/upload', function(req, res, next) {
         } 
     })(req, res, next); 
 });
-
-var fortune = require('./lib/fortune');
-var weather = require('./lib/weather');
-var credentials = require('./lib/credentials');
-app.use(require('cookie-parser')(credentials.cookiesSecret));
 app.use(require('express-session')({
     resave: false,
     saveUninitialized: false,
     secret: credentials.cookiesSecret
 }));
+app.use(function (req, res, next) { 
+    //res.locals is an object containing default context for rendering views
+    res.locals.showTests = app.get('env') !== 'production' && req.query.test === '1'; 
+
+    if (!res.locals.partials) {
+		res.locals.partials = {}; 
+    }
+    res.locals.partials.weatherContext = weather.getWeatherData(); 
+    
+    //if there is a flash message, transfer it to the context, then clear it
+    res.locals.flash = req.session.flash;
+    delete req.session.flash;
+    //If you don’t call next(), the pipeline will be terminated, 
+    //and no more route handlers or middleware will be processed. 
+    //If you don’t call next(), you should send a response to the client 
+    //(res.send, res.json, res.render, etc.); if you don’t, the client will hang and eventually time out.
+    next(); 
+});
 
 var tours = [
     {id: 0, name: 'Hood River', price: 99.99},
@@ -46,21 +64,6 @@ var handlebars = require('express-handlebars').create({
 }); 
 app.engine('handlebars', handlebars.engine); 
 app.set('view engine', 'handlebars');
-
-app.use(function (req, res, next) { 
-    //res.locals is an object containing default context for rendering views
-    res.locals.showTests = app.get('env') !== 'production' && req.query.test === '1'; 
-
-    if (!res.locals.partials) {
-		res.locals.partials = {}; 
-    }
-    res.locals.partials.weatherContext = weather.getWeatherData(); 
-    
-    //if there is a flash message, transfer it to the context, then clear it
-    res.locals.flash = req.session.flash;
-    delete req.session.flash;
-    next(); 
-});
 
 app.get('/', function (req , res) { 
     res.render('home');
@@ -103,6 +106,19 @@ app.get('/jquery-test', function(req, res) {
     res.render('jquery-test', {layout: 'sectionlayout'} ); 
 });
 
+app.get('/newsletter', function (req , res) { 
+    res.render('newsletter', { csrf : 'CSRF token goes here' }); 
+}); 
+
+app.get('/thank-you', function (req , res) { 
+    res.render('thank-you', {user: req.query.user}); 
+}); 
+
+app.get('/contest/vacation-photo', function(req, res) { 
+    var now=new Date(); 
+    res.render('contest/vacation-photo', { year: now.getFullYear(), month:now.getMonth() }); 
+}); 
+
 app.put('/api/tour/:id', function (req , res) { 
     var p = tours.filter(function(t) {
         return t.id == req.params.id
@@ -118,10 +134,6 @@ app.put('/api/tour/:id', function (req , res) {
     } else {
         res.json({error: 'No such tour exists.'});
     }
-}); 
-
-app.get('/newsletter', function (req , res) { 
-    res.render('newsletter', { csrf : 'CSRF token goes here' }); 
 }); 
 
 var VALID_EMAIL_REGEX = new RegExp('^[a-zA-Z0-9.!#$%&\'*+\/=?^_`{|}~-]+@' + 
@@ -167,10 +179,6 @@ app.post('/newsletter', function(req, res) {
     }); 
 });
 
-app.get('/thank-you', function (req , res) { 
-    res.render('thank-you', {user: req.query.user}); 
-}); 
-
 app.post('/process', function (req, res) { 
     if(req.xhr || req.accepts('json, html') ==='json') { 
         //if there were an error, we would send { error: 'error description' } 
@@ -179,11 +187,6 @@ app.post('/process', function (req, res) {
         //if there were an error, we would redirect to an error page 
         res.redirect(303, '/thank-you'); 
     }
-}); 
-
-app.get('/contest/vacation-photo', function(req, res) { 
-    var now=new Date(); 
-    res.render('contest/vacation-photo', { year: now.getFullYear(), month:now.getMonth() }); 
 }); 
 
 app.post('/contest/vacation-photo/:year/:month', function(req, res) { 
